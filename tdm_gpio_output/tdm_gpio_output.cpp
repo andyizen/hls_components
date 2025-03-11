@@ -12,6 +12,7 @@ void tdm_gpio_output(volatile bit_t *sclk, volatile bit_t *lrclk,
   static frame_t out_reg = 0;   // Holds the current frame.
   static int bit_index = 0;     // Index for the bit currently being output.
   static int clk_index = 0;
+  static hls::stream<sample_t> sample_stream;
 
   // Copy incoming data
   if (!in_stream.empty()) {

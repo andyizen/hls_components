@@ -4,20 +4,18 @@
 #include <ap_int.h>
 #include <hls_stream.h>
 
-// Define frame/channel parameters.
-#define NUM_CHANNELS 16
-#define CHANNEL_SIZE 32
-// FRAME_SIZE here represents the number of channels in a frame.
-#define FRAME_SIZE (NUM_CHANNELS * CHANNEL_SIZE)
-
-// Configurable parameter for parallelism.
-#ifndef NUM_PIPELINES
-#define NUM_PIPELINES 1
+#ifndef SYSTEM_SPECS
+#define SYSTEM_SPECS
+  const int CHANNEL_SIZE = 32;
+  const int NUM_CHANNELS = 16;
+  const int FRAME_SIZE = CHANNEL_SIZE * NUM_CHANNELS;
+  typedef ap_uint<1> bit_t;
+  typedef ap_uint<CHANNEL_SIZE> sample_t;
+  typedef ap_uint<FRAME_SIZE> frame_t;
 #endif
 
-// Type for a single channel (32 bits).
-typedef ap_uint<CHANNEL_SIZE> sample_t;
-typedef ap_uint<FRAME_SIZE> frame_t;
+#define NUM_PIPELINES 2
+
 
 // Top-level function that processes one frame.
 // It reads FRAME_SIZE samples from the input stream, processes them in

@@ -12,9 +12,8 @@ int main() {
   int frame_index = 0;
   int frame_size = FRAME_SIZE;
   const int PRE_CHARGES = 10;
-  int bit_index = 0;
   bool data = false;
-  const int mclks_per_bit = 4; // Testbench clock is 4x faster than sclk
+  const int mclks_per_bit = 8; // Testbench clock is 4x faster than sclk
 
   // Test parameters.
   const int num_frames = 3; // Number of frames to simulate

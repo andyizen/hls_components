@@ -14,10 +14,12 @@ void process_frame(hls::stream<sample_t> &in_stream,
 #pragma HLS ARRAY_PARTITION variable = frame cyclic factor = NUM_PIPELINES
 
 READ_IN:
-  // Read a frame: one sample per channel.
-  for (int i = 0; i < NUM_CHANNELS; i++) {
+  if (!in_stream.empty()) {
+    // Read a frame: one sample per channel.
+    for (int i = 0; i < NUM_CHANNELS; i++) {
 #pragma HLS PIPELINE II = 1
-    frame[i] = in_stream.read();
+      frame[i] = in_stream.read();
+    }
   }
 
   sample_t processed[NUM_CHANNELS];
