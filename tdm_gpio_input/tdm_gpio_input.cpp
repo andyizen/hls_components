@@ -4,7 +4,7 @@ enum State { CAPTURING, COPYING, TRANSMITTING };
 
 void tdm_gpio_input(volatile const bit_t *sdata, volatile const bit_t *sclk,
                     volatile const bit_t *lrclk,
-                    hls::stream<bit_t> &serial_stream) {
+                    hls::stream<sample_t> &serial_stream) {
 #pragma HLS INTERFACE ap_none port = sdata
 #pragma HLS INTERFACE ap_none port = sclk
 #pragma HLS INTERFACE ap_none port = lrclk
@@ -16,7 +16,9 @@ void tdm_gpio_input(volatile const bit_t *sdata, volatile const bit_t *sclk,
   static ap_uint<FRAME_SIZE> out_reg = 0;   // register to hold incoming frame
   static int bit_count = 0;                 // number of bits captured s
   static int out_bit_count = 0;
-  static bit_t old_sclk = 0; // for edge detection
+  static bit_t start = false;
+  static bit_t old_sclk = 0;  // for edge detection
+  static bit_t old_lrclk = 0; // for edge detection
 
   // Read current external signals
   bit_t current_sclk = *sclk;
@@ -24,43 +26,45 @@ void tdm_gpio_input(volatile const bit_t *sdata, volatile const bit_t *sclk,
   bit_t current_data = *sdata;
 
   // State machine operation:
+  // Waiting for lrclk to sync for last bit of old frame
+  if (old_lrclk == 1 && current_lrclk == 0) {
+    start = 1;
+  }
 
-  // Capture data on rising edge of sclk
-  if (old_sclk == 0 && current_sclk == 1) {
-    // Shift in the new bit (MSB-first)
-    frame_reg = (frame_reg << 1) | current_data;
+  // Once we saw lrclk we can start capturing
+  if (start) {
+    // Capture data on rising edge of sclk
+    if (old_sclk == 0 && current_sclk == 1) {
+      // Shift in the new bit (MSB-first)
+      frame_reg = (frame_reg << 1) | current_data;
 
-    // If lrclk is high on this rising edge, the frame is complete.
-    if (current_lrclk == 1) {
-      // Transition to TRANSMITTING state
-      state = COPYING;
-    } else {
+      // If lrclk is high on this rising edge, the frame is complete.
+      if (current_lrclk == 1) {
+        // Transition to TRANSMITTING state
+        state = COPYING;
+      }
       bit_count++;
     }
-  }
 
-  if (state == COPYING) {
-    if (bit_count == FRAME_SIZE - 1) {
+    // Extra state of copiying just to make sure nothing gets lost in the
+    // parallelism
+    if (state == COPYING) {
       out_reg = frame_reg;
+      bit_count = 0; // Reset counter for transmission index
+      frame_reg = 0;
       state = TRANSMITTING;
-    } else {
+    } else if (state == TRANSMITTING) {
+      // Shifting out the channels
+      for (int i = 0; i < NUM_CHANNELS; i++) {
+        sample_t out_channel =
+            (out_reg >> (CHANNEL_SIZE * (NUM_CHANNELS - 1 - i))) & MASK;
+        serial_stream.write(out_channel);
+      }
       state = CAPTURING;
     }
-    bit_count = 0; // Reset counter for transmission index
-    frame_reg = 0;
-  } else if (state == TRANSMITTING) {
-    // Transmit one bit per cycle from frame_reg (MSB-first)
-    bit_t out_bit = out_reg[FRAME_SIZE - 1 - out_bit_count];
-    serial_stream.write(out_bit);
-    out_bit_count++;
 
-    if (out_bit_count == FRAME_SIZE) {
-      out_reg = 0; // Optional: clear output register.
-      out_bit_count = 0;
-      state = CAPTURING;
-    }
+    // Update old_sclk for edge detection.
   }
-
-  // Update old_sclk for edge detection.
   old_sclk = current_sclk;
+  old_lrclk = current_lrclk;
 }

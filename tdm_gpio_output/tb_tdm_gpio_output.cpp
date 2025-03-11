@@ -17,7 +17,6 @@ int main() {
     test_frame = (test_frame << CHANNEL_SIZE) | channel_value;
   }
   // Write the test frame into the input stream.
-
   // Variables to simulate external signals.
   bit_t sclk;
   bit_t lrclk;
@@ -25,7 +24,6 @@ int main() {
 
   int bit_index;
   bool old_lrclk;
-  bool cur_lrclk;
 
   // We'll simulate clock cycles.
   const int total_cycles = (FRAME_SIZE * 8) * 2.5;
@@ -34,6 +32,7 @@ int main() {
     if (cycle == 50)
       in_stream.write(test_frame);
 
+    // Write into fifo off cycle to check if output gets disrupted
     if (cycle == 500)
       in_stream.write(test_frame);
 
@@ -43,8 +42,7 @@ int main() {
       check_frame = (check_frame << 1) | sdata;
     }
 
-    cur_lrclk = lrclk;
-    if (cur_lrclk == false && old_lrclk == true) {
+    if (lrclk == false && old_lrclk == true) {
       bit_index = 0;
       std::cout << "FRAME " << std::hex << test_frame << std::endl;
       std::cout << "CHECK " << std::hex << check_frame << std::endl;
@@ -52,7 +50,7 @@ int main() {
       bit_index++;
     }
 
-    old_lrclk = cur_lrclk;
+    old_lrclk = lrclk;
   }
 
   return 0;

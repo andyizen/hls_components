@@ -7,7 +7,7 @@ sample_t process_sample(sample_t sample) {
 }
 
 void process_frame(hls::stream<sample_t> &in_stream,
-                   hls::stream<sample_t> &out_stream) {
+                   hls::stream<frame_t> &out_stream) {
 
   // Array to hold one frame.
   sample_t frame[NUM_CHANNELS];
@@ -31,9 +31,13 @@ PROCESS:
   }
 
 WRITE_OUT:
-  // Write out the processed frame.
+  // Pack the processed samples into one frame and write it out.
+  frame_t output_frame = 0;
   for (int i = 0; i < NUM_CHANNELS; i++) {
-#pragma HLS PIPELINE II = 1
-    out_stream.write(processed[i]);
+    // Pack each sample MSB-first.
+    // The first sample becomes the most-significant 32 bits.
+#pragma HLS UNROLL
+    output_frame = (output_frame << CHANNEL_SIZE) | processed[i];
   }
+  out_stream.write(output_frame);
 }

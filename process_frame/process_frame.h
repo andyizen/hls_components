@@ -8,7 +8,7 @@
 #define NUM_CHANNELS 16
 #define CHANNEL_SIZE 32
 // FRAME_SIZE here represents the number of channels in a frame.
-#define FRAME_SIZE NUM_CHANNELS
+#define FRAME_SIZE (NUM_CHANNELS * CHANNEL_SIZE)
 
 // Configurable parameter for parallelism.
 #ifndef NUM_PIPELINES
@@ -17,11 +17,12 @@
 
 // Type for a single channel (32 bits).
 typedef ap_uint<CHANNEL_SIZE> sample_t;
+typedef ap_uint<FRAME_SIZE> frame_t;
 
 // Top-level function that processes one frame.
 // It reads FRAME_SIZE samples from the input stream, processes them in
 // parallel, and writes out FRAME_SIZE processed samples to the output stream.
 void process_frame(hls::stream<sample_t> &in_stream,
-                   hls::stream<sample_t> &out_stream);
+                   hls::stream<frame_t> &out_stream);
 
 #endif
