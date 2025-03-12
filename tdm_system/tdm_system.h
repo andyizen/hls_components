@@ -11,7 +11,7 @@
 // Internally, it creates streams that connect the TDM input to the frame
 // processing and then to the TDM output.
 void tdm_system(volatile const bit_t *sclk_in, volatile const bit_t *lrclk_in,
-                volatile const bit_t *sdata_in,
-                hls::stream<frame_t> &frame_stream);
+                volatile const bit_t *sdata_in, volatile bit_t *sclk_out,
+                volatile bit_t *lrclk_out, volatile bit_t *sdata_out);
 
 #endif

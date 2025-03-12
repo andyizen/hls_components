@@ -18,6 +18,5 @@ typedef ap_uint<FRAME_SIZE> frame_t;
 const ap_uint<CHANNEL_SIZE> MASK = ~((ap_uint<CHANNEL_SIZE>)0);
 
 void tdm_gpio_input(volatile const bit_t *sdata, volatile const bit_t *sclk,
-                    volatile const bit_t *lrclk,
-                    hls::stream<sample_t> &serial_stream);
+                    volatile const bit_t *lrclk, hls::stream<sample_t> &out);
 #endif

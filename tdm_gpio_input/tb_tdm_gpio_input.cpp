@@ -7,7 +7,7 @@
 // For this testbench, assume the testbench clock runs 4x faster than sclk.
 int main() {
 
-  hls::stream<sample_t> out_stream;
+  hls::stream<sample_t> our_reg;
   int bit_count = 0;
   int frame_index = 0;
   int frame_size = FRAME_SIZE;
@@ -23,7 +23,7 @@ int main() {
   frame_t test_frames[num_frames];
   for (int i = 0; i < num_frames; i++) {
     for (int j = 0; j < NUM_CHANNELS; j++) {
-      sample_t channel = pow(j, (i + 1));
+      sample_t channel = j;
       test_frames[i] = (test_frames[i] << CHANNEL_SIZE) | channel;
     }
   }
@@ -46,7 +46,7 @@ int main() {
       } else if (cycle >= mclks_per_bit / 2) {
         sclk_sim = 1;
       }
-      tdm_gpio_input(&sdata_sim, &sclk_sim, &lrclk_sim, out_stream);
+      tdm_gpio_input(&sdata_sim, &sclk_sim, &lrclk_sim, our_reg);
     }
   }
 
@@ -58,7 +58,12 @@ int main() {
     }
 
     int shift_index = FRAME_SIZE - 1 - (sclks % FRAME_SIZE);
-    sdata_sim = (test_frames[frame_index] >> shift_index) & 1;
+
+    // Clk data in, if we reached the end of the test samples clk in zeros
+    if (sclks < FRAME_SIZE * num_frames)
+      sdata_sim = (test_frames[frame_index] >> shift_index) & 1;
+    else
+      sdata_sim = 0;
 
     for (int mclk = 0; mclk < mclks_per_bit; mclk++) {
       if (mclk < (mclks_per_bit / 2 - 1)) {
@@ -66,7 +71,7 @@ int main() {
       } else if (mclk >= mclks_per_bit / 2) {
         sclk_sim = 1;
       }
-      tdm_gpio_input(&sdata_sim, &sclk_sim, &lrclk_sim, out_stream);
+      tdm_gpio_input(&sdata_sim, &sclk_sim, &lrclk_sim, our_reg);
     }
     if (bit_count == FRAME_SIZE - 1) {
       bit_count = 0;
@@ -78,13 +83,13 @@ int main() {
 
   // After simulation, reconstruct frames from the output stream.
   int fail_count = 0;
-  std::cout << "Received " << out_stream.size() << " samples in out_stream."
+  std::cout << "Received " << our_reg.size() << " samples in our_reg."
             << std::endl;
 
   for (int i = 0; i < num_frames; i++) {
     for (int j = 0; j < NUM_CHANNELS; j++) {
-      if (!out_stream.empty()) {
-        sample_t channel = out_stream.read();
+      if (!our_reg.empty()) {
+        sample_t channel = our_reg.read();
 
         int shift_index = (NUM_CHANNELS - 1 - j) * CHANNEL_SIZE;
         sample_t test_ch = test_frames[i] >> shift_index & MASK;
