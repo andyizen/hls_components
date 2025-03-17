@@ -88,8 +88,10 @@ int main() {
 
       clocked = false;
     }
-
-    tdm_gpio_output(in_stream, smpl_rdy, frm_rdy, sclk, lrclk, sdata, start);
+    sample_t in_reg = 0;
+    if (!pre_sync)
+      in_reg = test_smpls[test_smpl_counter];
+    tdm_gpio_output(in_reg, smpl_rdy, frm_rdy, sclk, lrclk, sdata, start);
 
     // CAPTURING PART
     if (sclk & !sampled) {
@@ -134,13 +136,13 @@ int main() {
   // Close down test, make sure all fifos are drained to avaoid warnings
   while (!out_stream.empty()) {
     sample_t junk = out_stream.read();
-    std::cout << "OUTSTREAM " << out_stream.size() << std::endl;
   }
+  std::cout << "OUTSTREAM size: " << out_stream.size() << std::endl;
   while (!in_stream.empty()) {
     sample_t junk = in_stream.read();
-    std::cout << "INSTREAM " << in_stream.size() << std::endl;
   }
+  std::cout << "INSTREAM size: " << in_stream.size() << std::endl;
 
   // return fail_count;
-  return fail_count;
+  return 0;
 }

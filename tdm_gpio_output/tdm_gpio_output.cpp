@@ -1,89 +1,84 @@
 #include "tdm_gpio_output.h"
 
-void tdm_gpio_output(hls::stream<sample_t> &in_stream, bit_t sample_rdy,
-                     bit_t frame_rdy, bit_t &sclk, bit_t &lrclk, bit_t &sdata,
-                     bit_t &started) {
+void tdm_gpio_output(sample_t &in_stream, bit_t sample_rdy, bit_t frame_rdy,
+                     bit_t &sclk, bit_t &lrclk, bit_t &sdata, bit_t &started) {
 #pragma HLS INTERFACE mode = ap_none port = sclk
 #pragma HLS INTERFACE mode = ap_none port = lrclk
 #pragma HLS INTERFACE mode = ap_none port = sdata
 #pragma HLS INTERFACE mode = ap_none port = started
+#pragma HLS INTERFACE mode = ap_none port = in_stream
 
 #pragma HLS INTERFACE mode = ap_ctrl_none port = return
-#pragma HLS INTERFACE ap_fifo port = in_stream depth = 1
+  enum CountLock { UNLOCKED, LOCKED };
+  enum FrameState { WAIT_FOR_NEW, NEW };
 
   // Static variables to hold state between cycles.
-  static sample_t frame_reg = 0;   // Holds the current frame.
+  static sample_t _smpl_reg = 0;   // Holds the current frame.
   static sample_t out_reg = 0;     // Holds the current frame.
-  static ap_uint<5> bit_index = 0; // Index for the bit currently being output.
-  static ap_uint<12> clk_index = 0;
-  static ap_uint<4> ch_index = 0; // Channel counter
+  static ap_uint<5> _bit_cnt_ = 0; // Index for the bit currently being output.
+  static CountLock _bit_cnt_lck = UNLOCKED;
+  static ap_uint<11> _clk_cnt_ = 0;
+  static ap_uint<4> _smpl_cnt_ = 0; // Channel counter
 
-  static bool start_output = false;
-  static bool clocked = false;
-  static bool sample_read = false;
-  static bool sclk_state = 0;
-  static bool lrclk_state = 0;
-  static bool sdata_state = 0;
+  static FrameState _frm_stt_ = WAIT_FOR_NEW;
+  static bool _strt_stt_ = false;
+  static bool _sclk_stt_ = 0;
+  static bool _lrclk_stt_ = 0;
+  static bool _sdata_stt_ = 0;
 
-  // TODO??
-  // I still need to shift the 24Bit output
-  // how do i handle this constant read ??
+  // Read from the input stream when a new sample is ready
+  if (sample_rdy) {
+    if (frame_rdy && _frm_stt_ == WAIT_FOR_NEW) {
+      _strt_stt_ = true;
+      _bit_cnt_ = 0;
+      _smpl_cnt_ = 0;
+      _clk_cnt_ = 0;
+      _frm_stt_ = NEW;
+    } else if (!frame_rdy) {
+      _frm_stt_ = WAIT_FOR_NEW;
+    }
 
-  // Read from the input stream when a new frame is ready
-  if (sample_rdy && frame_rdy && !sample_read) {
-    frame_reg = in_stream.read();
-    sample_read = true;
-    start_output = true;
-  } else if (sample_rdy && !sample_read) {
-    frame_reg = in_stream.read();
-    sample_read = true;
-  } else if (!sample_rdy && sample_read) {
-    sample_read = false;
+    _smpl_reg = in_stream;
   }
 
-  if (start_output) {
+  if (_strt_stt_) {
     // Generate the bit clock (sclk) waveform
-    if ((clk_index % CLKS_PER_BIT) == 0) {
-      sclk_state = 0;
-      sdata_state = (frame_reg >> (CHANNEL_SIZE - 1 - bit_index)) & 1;
-    } else if ((clk_index % CLKS_PER_BIT) == CLKS_PER_BIT - 1) {
-      clocked = true;
-    } else if ((clk_index % CLKS_PER_BIT) >= (CLKS_PER_BIT / 2)) {
-      sclk_state = 1;
-    }
+    if ((_clk_cnt_ % CLKS_PER_BIT) < (CLKS_PER_BIT / 2) &&
+        _bit_cnt_lck == UNLOCKED) {
+      _sclk_stt_ = 0;
+      _bit_cnt_lck = LOCKED;
+      _sdata_stt_ = (_smpl_reg >> (CHANNEL_SIZE - 1 - _bit_cnt_)) & 1;
 
-    // Update bit index on the falling edge of sclk
-    if (clocked) {
-      if (bit_index < CHANNEL_SIZE - 1) {
-        bit_index++;
+      // LRCLK
+      if (_smpl_cnt_ == NUM_CHANNELS - 1 && _bit_cnt_ == CHANNEL_SIZE - 1) {
+        _lrclk_stt_ = 1;
+        // Reset channel index when frame completes
       } else {
-        bit_index = 0; // Reset bit index
-        ch_index++;    // Increment channel index when a full word is sent
+        _lrclk_stt_ = 0;
       }
-      clocked = false;
+    } else if ((_clk_cnt_ % CLKS_PER_BIT) >= (CLKS_PER_BIT / 2) &&
+               _bit_cnt_lck == LOCKED) {
+      if (_bit_cnt_ == CHANNEL_SIZE - 1) {
+        _smpl_cnt_++;
+      }
+      _sclk_stt_ = 1;
+      _bit_cnt_lck = UNLOCKED;
+      _bit_cnt_++;
     }
 
-    // Set lrclk at the last bit of the last channel
-    if (ch_index == NUM_CHANNELS - 1 && bit_index == CHANNEL_SIZE - 1) {
-      lrclk_state = 1;
-      // Reset channel index when frame completes
-    } else {
-      lrclk_state = 0;
-    }
-
-    clk_index++;
-    sclk = sclk_state;
-    sdata = sdata_state;
-    lrclk = lrclk_state;
+    _clk_cnt_++;
+    sclk = _sclk_stt_;
+    sdata = _sdata_stt_;
+    lrclk = _lrclk_stt_;
 
   } else {
     // Reset outputs and internal counters when not in active transmission
     sclk = 0;
     lrclk = 0;
     sdata = 0;
-    bit_index = 0;
-    clk_index = 0;
-    ch_index = 0;
+    _bit_cnt_ = 0;
+    _clk_cnt_ = 0;
+    _smpl_cnt_ = 0;
   }
-  started = start_output;
+  started = _strt_stt_;
 }

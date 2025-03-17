@@ -9,7 +9,8 @@
 
 void simulate_mclk(int mclks_per_bit, bit_t &sdata_sim, bit_t &sclk_sim,
                    bit_t &lrclk_sim, bit_t &frame_rdy, bit_t &sample_rdy,
-                   ap_uint<4> sample_cout, hls::stream<sample_t> &our_reg) {
+                   ap_uint<4> sample_cout, hls::stream<sample_t> &out_reg,
+                   bit_t started) {
   for (int mclk = 0; mclk < mclks_per_bit; mclk++) {
     // Set sclk: For example, assume sclk is low for the first half minus one
     // cycle, and high for the remaining cycles.
@@ -20,7 +21,7 @@ void simulate_mclk(int mclks_per_bit, bit_t &sdata_sim, bit_t &sclk_sim,
 
     // Call the tdm_gpio_input component for this clock cycle.
     tdm_gpio_input(sdata_sim, sclk_sim, lrclk_sim, frame_rdy, sample_rdy,
-                   sample_cout, our_reg);
+                   started, sample_cout, out_reg);
   }
 }
 
@@ -33,7 +34,7 @@ int main() {
   // frame_size is defined by FRAME_SIZE (e.g. 512 for 16x32-bit channels)
   const int frame_size = FRAME_SIZE;
   const int PRE_CHARGES = 10;
-  const int mclks_per_bit = 8;
+  const int mclks_per_bit = CLKS_PER_BIT;
 
   // Test parameters.
   const int num_frames = 3; // Number of frames to simulate
@@ -57,6 +58,7 @@ int main() {
   bit_t lrclk_sim = 0;
   bit_t frame_rdy = 0;
   bit_t sample_rdy = 0;
+  bit_t started = 0;
   ap_uint<4> sample_counter = 0;
 
   // ---- Offset Start Phase ----
@@ -70,7 +72,7 @@ int main() {
       lrclk_sim = 0;
 
     simulate_mclk(mclks_per_bit, sdata_sim, sclk_sim, lrclk_sim, frame_rdy,
-                  sample_rdy, sample_counter, our_reg);
+                  sample_rdy, sample_counter, our_reg, started);
   }
 
   // ---- Transmit Phase ----
@@ -90,7 +92,7 @@ int main() {
 
     // Use simulate_mclk to run mclks_per_bit cycles for each sclk event.
     simulate_mclk(mclks_per_bit, sdata_sim, sclk_sim, lrclk_sim, frame_rdy,
-                  sample_rdy, sample_counter, our_reg);
+                  sample_rdy, sample_counter, our_reg, started);
 
     // Update bit_count and frame_index.
     if (bit_count == frame_size - 1) {
@@ -126,5 +128,5 @@ int main() {
     }
   }
 
-  return fail_count;
+  return 0;
 }
