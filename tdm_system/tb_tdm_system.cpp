@@ -1,92 +1,30 @@
+#include "tb_tdm_system.h"
+#include "ap_int.h"
 #include "tdm_system.h"
-#include <ap_int.h>
-#include <cmath>
 #include <hls_stream.h>
 #include <iostream>
+#include <stdlib.h>
+
+TDM_signal tdm_in{12};
+sample_t out_reg;
+ap_uint<32> pout_reg;
+ap_uint<32> data = 0;
+
+bit_t sclk_out;
+bit_t lrclk_out;
+bit_t sdata_out;
+bool lck_new_data = false;
 
 int main() {
+  int total_clc_cycles = 1200 * CLKS_PER_BIT;
+  for (int i = 0; i < total_clc_cycles; i++) {
 
-  int bit_count = 0;
-  int frame_index = 0;
-  int frame_size = FRAME_SIZE;
-  const int PRE_CHARGES = 10;
-  bool data = false;
-  // Testbench clock is 4x faster than sclk
-  const int mclks_per_bit = 8;
+    // Set simulation data and CLOCKING the tdm master signal
+    tdm_in.master_clk(i, data);
 
-  // Test parameters.
-  const int num_frames = 3; // Number of frames to simulate
-  const int transmit_cycles = FRAME_SIZE * num_frames + FRAME_SIZE / 2;
-  hls::stream<frame_t> out_stream;
-
-  // Test frames: example patterns.
-  frame_t test_frames[num_frames];
-  for (int i = 0; i < num_frames; i++) {
-    for (int j = 0; j < NUM_CHANNELS; j++) {
-      sample_t channel = j + i;
-      test_frames[i] = (test_frames[i] << CHANNEL_SIZE) | channel;
-    }
+    // Sending the signals into the component
+    tdm_system(tdm_in.sclk, tdm_in.lrclk, tdm_in.sdata, sclk_out, lrclk_out,
+               sdata_out);
   }
-
-  // Simulated external signals (initial values)
-  bit_t sdata_sim_in = 0;
-  bit_t sclk_sim_in = 0;
-  bit_t lrclk_sim_in = 0;
-  bit_t sdata_sim_out;
-  bit_t sclk_sim_out;
-  bit_t lrclk_sim_out;
-
-  // Simulate offset start
-  for (int pre_clks = 0; pre_clks < PRE_CHARGES; pre_clks++) {
-    if (pre_clks == PRE_CHARGES - 1) {
-      lrclk_sim_in = 1;
-    } else {
-      lrclk_sim_in = 0;
-    }
-    for (int cycle = 0; cycle < mclks_per_bit; cycle++) {
-      if (cycle < (mclks_per_bit / 2 - 1)) {
-        sclk_sim_in = 0;
-      } else if (cycle >= mclks_per_bit / 2) {
-        sclk_sim_in = 1;
-      }
-      tdm_system(&sclk_sim_in, &lrclk_sim_in, &sdata_sim_in, &sclk_sim_out,
-                 &lrclk_sim_out, &sdata_sim_out);
-    }
-  }
-  // Simulate actual clk cycle
-  for (int sclks = 0; sclks < transmit_cycles; sclks++) {
-    if (sclks % FRAME_SIZE == FRAME_SIZE - 1) {
-      lrclk_sim_in = 1;
-    } else {
-      lrclk_sim_in = 0;
-    }
-
-    int shift_index = FRAME_SIZE - 1 - (sclks % FRAME_SIZE);
-    sdata_sim_in = (test_frames[frame_index] >> shift_index) & 1;
-
-    for (int mclk = 0; mclk < mclks_per_bit; mclk++) {
-      if (mclk < (mclks_per_bit / 2 - 1)) {
-        sclk_sim_in = 0;
-      } else if (mclk >= mclks_per_bit / 2) {
-        sclk_sim_in = 1;
-      }
-      tdm_system(&sclk_sim_in, &lrclk_sim_in, &sdata_sim_in, &sclk_sim_out,
-                 &lrclk_sim_out, &sdata_sim_out);
-    }
-    if (bit_count == FRAME_SIZE - 1) {
-      bit_count = 0;
-      frame_index++;
-    } else {
-      bit_count++;
-    }
-  }
-
-  // After simulation, reconstruct frames from the output stream.
-  int fail_count = 0;
-  /* std::cout << "Received " << out_stream.size() << " samples in our_reg."
-            << std::endl; */
-
-  // Return fail count, since every return value except 0 leads to a failed
-  // test
-  return fail_count;
+  return 0;
 }
