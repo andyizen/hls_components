@@ -1,7 +1,7 @@
 #include "tdm_gpio_input.h"
 
 void tdm_gpio_input(bit_t sclk_in, bit_t lrclk_in, bit_t sdata_in,
-                    sample_t &sample_reg, ap_uint<32> &out_reg) {
+                    sample_pipe_t &sample_reg) {
 
 #pragma HLS INTERFACE ap_none port = sclk_in
 #pragma HLS INTERFACE ap_none port = lrclk_in
@@ -13,14 +13,14 @@ void tdm_gpio_input(bit_t sclk_in, bit_t lrclk_in, bit_t sdata_in,
   enum LockStatus { LOCKED, UNLOCKED };
   // Static variables to preserve state.
   static bit_t old_clk = 0;
-  static ap_uint<5> _sclk_cnt_ = 0;
+  static ap_uint<CNT_BIT_DEPTH_SIZE_CHANNEL> _sclk_cnt_ = 0;
   static LockStatus _sclk_cnt_stt_ = LOCKED;
-  static ap_uint<32> _smpl_reg_ = (ap_uint<32>)0;
-  static ap_uint<32> _smpl_reg_ltchd_ = (ap_uint<32>)0;
+  static sample_t _smpl_reg_ = (sample_t)0;
+  static sample_t _smpl_reg_ltchd_ = (sample_t)0;
   static bool _frm_sync_stt_ = false;
 
   if (lrclk_in && sclk_in && !_frm_sync_stt_) {
-    _sclk_cnt_ = CHANNEL_SIZE - 1;
+    _sclk_cnt_ = SIZE_CHANNEL - 1;
     _frm_sync_stt_ = true;
   }
   if (_frm_sync_stt_) {
@@ -38,5 +38,4 @@ void tdm_gpio_input(bit_t sclk_in, bit_t lrclk_in, bit_t sdata_in,
       _sclk_cnt_stt_ = UNLOCKED;
     }
   }
-  out_reg = _smpl_reg_ltchd_;
 }

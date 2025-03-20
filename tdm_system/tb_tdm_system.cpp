@@ -6,9 +6,7 @@
 #include <stdlib.h>
 
 TDM_signal tdm_in{12};
-sample_t out_reg;
-ap_uint<32> pout_reg;
-ap_uint<32> data = 0;
+sample_t data = 0;
 
 bit_t sclk_out;
 bit_t lrclk_out;
@@ -16,7 +14,7 @@ bit_t sdata_out;
 bool lck_new_data = false;
 
 int main() {
-  int total_clc_cycles = 1200 * CLKS_PER_BIT;
+  int total_clc_cycles = 1200 * MCLKS_PER_BIT;
   for (int i = 0; i < total_clc_cycles; i++) {
 
     // Set simulation data and CLOCKING the tdm master signal

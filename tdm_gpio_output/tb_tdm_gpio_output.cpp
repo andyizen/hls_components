@@ -8,16 +8,16 @@
 #include <stdlib.h>
 
 // Assume the following constants and types are defined elsewhere:
-// const int CHANNEL_SIZE;
+// const int SIZE_CHANNEL;
 // const int NUM_CHANNELS;
-// const int CLKS_PER_BIT;
+// const int MCLKS_PER_BIT;
 // using bit_t = int; // or a specific type
 
 // Base class defining the template method
 
 TDM_signal_dummy tdm_in{12};
-ap_uint<32> data = 0;
-sample_t in_reg;
+sample_t data = 0;
+sample_pipe_t in_reg;
 
 bit_t sclk_out;
 bit_t lrclk_out;
@@ -25,7 +25,7 @@ bit_t sdata_out;
 bool lck_new_data = false;
 
 int main() {
-  int total_clc_cycles = 1200 * CLKS_PER_BIT;
+  int total_clc_cycles = 1200 * MCLKS_PER_BIT;
   for (int i = 0; i < total_clc_cycles; i++) {
 
     tdm_in.master_clk(i);

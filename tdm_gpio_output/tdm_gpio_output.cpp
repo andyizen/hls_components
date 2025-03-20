@@ -1,6 +1,6 @@
 #include "tdm_gpio_output.h"
 
-void tdm_gpio_output(sample_t &in_stream, bit_t &sclk, bit_t &lrclk,
+void tdm_gpio_output(sample_pipe_t &in_stream, bit_t &sclk, bit_t &lrclk,
                      bit_t &sdata) {
 
 #pragma HLS INTERFACE mode = axis port = in_stream depth = 1
@@ -12,10 +12,10 @@ void tdm_gpio_output(sample_t &in_stream, bit_t &sclk, bit_t &lrclk,
   enum LockStatus { UNLOCKED, LOCKED };
 
   // Static variables to hold state between cycles.
-  static ap_uint<32> _smpl_reg = 0;
-  static ap_uint<5> _bit_cnt_ = CHANNEL_SIZE - 1;
-  static ap_uint<2> _clk_cnt_ = 0;
-  static ap_uint<4> _smpl_cnt_ = NUM_CHANNELS - 2;
+  static sample_t _smpl_reg = 0;
+  static ap_uint<CNT_BIT_DEPTH_SIZE_CHANNEL> _bit_cnt_ = SIZE_CHANNEL - 1;
+  static ap_uint<CNT_BIT_DEPTH_MCLKS_PER_BIT> _mclk_cnt_ = 0;
+  static ap_uint<CNT_BIT_DEPTH_NUM_CHANNELS> _smpl_cnt_ = NUM_CHANNELS - 2;
 
   static bool _sclk_stt_ = 0;
   static bool _lrclk_stt_ = 0;
@@ -32,7 +32,7 @@ void tdm_gpio_output(sample_t &in_stream, bit_t &sclk, bit_t &lrclk,
 
   if (_first_smpl_read) {
     // Generate the bit clock (sclk) waveform
-    if (!(_clk_cnt_ % CLKS_PER_BIT)) {
+    if (!(_mclk_cnt_ % MCLKS_PER_BIT)) {
       // SCLK
       _sclk_stt_ = 0;
 
@@ -43,19 +43,19 @@ void tdm_gpio_output(sample_t &in_stream, bit_t &sclk, bit_t &lrclk,
       }
 
       // LRCLK
-      if (_smpl_cnt_ == NUM_CHANNELS - 1 && _bit_cnt_ == CHANNEL_SIZE - 1) {
+      if (_smpl_cnt_ == NUM_CHANNELS - 1 && _bit_cnt_ == SIZE_CHANNEL - 1) {
         _lrclk_stt_ = 1;
       } else {
         _lrclk_stt_ = 0;
       }
 
       // SDATA
-      _sdata_stt_ = (_smpl_reg >> (CHANNEL_SIZE - 1 - _bit_cnt_)) & 1;
+      _sdata_stt_ = (_smpl_reg >> (SIZE_CHANNEL - 1 - _bit_cnt_)) & 1;
 
-    } else if ((_clk_cnt_ % CLKS_PER_BIT) == (CLKS_PER_BIT / 2)) {
+    } else if ((_mclk_cnt_ % MCLKS_PER_BIT) == (MCLKS_PER_BIT / 2)) {
       _sclk_stt_ = 1;
       // Reset LOCKS
-      if (_bit_cnt_ == CHANNEL_SIZE - 1) {
+      if (_bit_cnt_ == SIZE_CHANNEL - 1) {
         _read_stt_ = UNLOCKED;
       }
     }
@@ -65,7 +65,7 @@ void tdm_gpio_output(sample_t &in_stream, bit_t &sclk, bit_t &lrclk,
     _lrclk_stt_ = 0;
   }
 
-  _clk_cnt_++;
+  _mclk_cnt_++;
   sclk = _sclk_stt_;
   sdata = _sdata_stt_;
   lrclk = _lrclk_stt_;
