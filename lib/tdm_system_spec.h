@@ -16,20 +16,27 @@ constexpr int bitsNeeded(int n) {
 #include <hls_stream.h>
 #endif
 
-const int SIZE_CHANNEL = 32;
-const int CNT_BIT_DEPTH_SIZE_CHANNEL = bitsNeeded(SIZE_CHANNEL);
+const int SIZE_SAMPLE = 32;
+typedef ap_uint<SIZE_SAMPLE> smpl_t;
+const int CNT_BIT_DEPTH_SIZE_SAMPLE = bitsNeeded(SIZE_SAMPLE);
+typedef ap_uint<CNT_BIT_DEPTH_SIZE_SAMPLE> smpl_bts_cntr_t;
+
 const int NUM_CHANNELS = 16;
 const int CNT_BIT_DEPTH_NUM_CHANNELS = bitsNeeded(NUM_CHANNELS);
+typedef ap_uint<CNT_BIT_DEPTH_NUM_CHANNELS> ch_cntr_t;
+
 const int MCLKS_PER_BIT = 4;
 const int CNT_BIT_DEPTH_MCLKS_PER_BIT = bitsNeeded(MCLKS_PER_BIT);
+typedef ap_uint<CNT_BIT_DEPTH_MCLKS_PER_BIT> mclk_cntr_t;
 
 typedef ap_uint<1> bit_t;
-typedef ap_uint<SIZE_CHANNEL> sample_t;
+
+typedef ap_uint<SIZE_SAMPLE> smpl_t;
 
 #ifndef HLS_STREAM
-typedef sample_t sample_pipe_t;
+typedef smpl_t smpl_ppln_t;
 #else
-typedef hls::stream<sample_t> sample_pipe_t;
+typedef hls::stream<smpl_t> smpl_ppln_t;
 #endif
 
 #endif

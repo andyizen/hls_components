@@ -18,26 +18,26 @@ private:
       sclk = 1;
     }
 
-    if (sample_index == NUM_CHANNELS - 1 && bit_index == SIZE_CHANNEL - 1) {
+    if (sample_index == NUM_CHANNELS - 1 && bit_index == SIZE_SAMPLE - 1) {
       lrclk = 1;
     } else {
       lrclk = 0;
     }
   };
-  void processData(int cur_clk_cycle, sample_t &data) {
+  void processData(int cur_clk_cycle, smpl_t &data) {
     // Process the data based on the state of data_lock.
     if (!lrclk_seen) {
       sdata = (bit_index + sample_index) % 2;
     } else {
-      sdata = data[SIZE_CHANNEL - 1 - bit_index];
+      sdata = data[SIZE_SAMPLE - 1 - bit_index];
     }
   }
-  void simulation_data(sample_t &data_container) {
+  void simulation_data(smpl_t &data_container) {
     static bool rdy_for_next_sample = true;
     if (lrclk_seen) {
       if (!bit_index && rdy_for_next_sample) {
         // Here we can set any new sample
-        data_container = (data_container + 1) | (sample_t)0;
+        data_container = (data_container + 1) | (smpl_t)0;
         rdy_for_next_sample = false;
       } else if (bit_index > 0) {
         rdy_for_next_sample = true;
@@ -46,7 +46,7 @@ private:
   }
 
 public:
-  void master_clk(int cur_clk_cycle, sample_t &data) override {
+  void master_clk(int cur_clk_cycle, smpl_t &data) override {
     simulation_data(data);
     updateCounters(cur_clk_cycle);
     processData(cur_clk_cycle, data);

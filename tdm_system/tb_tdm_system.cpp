@@ -6,7 +6,7 @@
 #include <stdlib.h>
 
 TDM_signal tdm_in{12};
-sample_t data = 0;
+smpl_t data = 0;
 
 bit_t sclk_out;
 bit_t lrclk_out;

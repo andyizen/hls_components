@@ -6,9 +6,9 @@
 #include <stdlib.h>
 
 TDM_signal tdm_in{12};
-sample_pipe_t out_reg;
-sample_t pout_reg;
-sample_t data = 0;
+smpl_ppln_t out_reg;
+smpl_t pout_reg;
+smpl_t data = 0;
 
 int main() {
   int total_clc_cycles = 550 * MCLKS_PER_BIT;

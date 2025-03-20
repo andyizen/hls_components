@@ -7,17 +7,9 @@
 #include <iostream>
 #include <stdlib.h>
 
-// Assume the following constants and types are defined elsewhere:
-// const int SIZE_CHANNEL;
-// const int NUM_CHANNELS;
-// const int MCLKS_PER_BIT;
-// using bit_t = int; // or a specific type
-
-// Base class defining the template method
-
 TDM_signal_dummy tdm_in{12};
-sample_t data = 0;
-sample_pipe_t in_reg;
+smpl_t data = 0;
+smpl_ppln_t in_reg;
 
 bit_t sclk_out;
 bit_t lrclk_out;

@@ -14,7 +14,7 @@ void tdm_system(const bit_t sclk_in, const bit_t lrclk_in, const bit_t sdata_in,
   bit_t smpl_rdy = 0;
   bit_t frame_rdy = 0;
   bit_t started = 0;
-  sample_pipe_t data_out;
+  smpl_ppln_t data_out;
 
 #pragma HLS DATAFLOW
   tdm_gpio_input(sclk_in, lrclk_in, sdata_in, data_out);

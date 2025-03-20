@@ -13,16 +13,16 @@ public:
   bool lrclk_seen;
 
   TDM_signal_base(int start_offset)
-      : start_offset(start_offset), bit_index(start_offset % SIZE_CHANNEL),
+      : start_offset(start_offset), bit_index(start_offset % SIZE_SAMPLE),
         sample_index(start_offset % NUM_CHANNELS), lrclk_seen(false) {}
 
 public:
-  virtual void master_clk(int cur_clk_cycle, sample_t &data) = 0;
+  virtual void master_clk(int cur_clk_cycle, smpl_t &data) = 0;
 
 protected:
   void updateCounters(int cur_clk_cycle) {
     if (cur_clk_cycle % MCLKS_PER_BIT == 0) {
-      if (bit_index == SIZE_CHANNEL - 1)
+      if (bit_index == SIZE_SAMPLE - 1)
         bit_index = 0;
       else
         ++bit_index;
