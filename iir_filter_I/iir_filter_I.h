@@ -3,6 +3,6 @@
 
 #include "../lib/tdm_system_spec.h"
 
-void iir_filter_I(smpl_ppln_t in, smpl_ppln_t out);
+void iir_filter_I(ap_uint<64> in_stream, ap_uint<64> &out_stream);
 
 #endif
