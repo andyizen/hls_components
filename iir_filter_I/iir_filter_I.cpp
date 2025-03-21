@@ -4,12 +4,13 @@
 
 FilterFactors factors_array[NUM_CHANNELS];
 
-void read_stream(ap_uint<64> in_stream, ap_uint<4> in_reg[NUM_CHANNELS]) {
-#pragma HLS INLINE
+void read_stream(ap_uint<4> in_stream[NUM_CHANNELS],
+                 ap_uint<4> in_reg[NUM_CHANNELS]) {
+#pragma HLS INLINE off
+READ_LOOP:
   for (int i = 0; i < NUM_CHANNELS; i++) {
-#pragma HLS PIPELINE rewind
-#pragma HLS UNROLL factor = 16
-    in_reg[i] = (in_stream >> (4 * i)) & 0xF;
+#pragma HLS PIPELINE II = 16
+    in_reg[i] = in_stream[i];
   }
 }
 
@@ -17,6 +18,7 @@ void process_channels(ap_uint<4> in_reg[NUM_CHANNELS],
                       ap_uint<4> out_reg[NUM_CHANNELS],
                       Biquad biquads[NUM_CHANNELS]) {
 #pragma HLS INLINE
+PROCESS_LOOP:
   for (int i = 0; i < NUM_CHANNELS; i++) {
 #pragma HLS PIPELINE rewind
 #pragma HLS UNROLL factor = 16
@@ -24,17 +26,21 @@ void process_channels(ap_uint<4> in_reg[NUM_CHANNELS],
   }
 }
 
-void write_stream(ap_uint<4> out_reg[NUM_CHANNELS], ap_uint<64> &out_stream) {
-#pragma HLS INLINE
-  out_stream = 0;
+void write_stream(ap_uint<4> out_reg[NUM_CHANNELS],
+                  ap_uint<4> out_stream[NUM_CHANNELS]) {
+#pragma HLS INLINE off
+WRITE_LOOP:
   for (int i = 0; i < NUM_CHANNELS; i++) {
-#pragma HLS PIPELINE rewind
-#pragma HLS UNROLL factor = 16
-    out_stream = (out_stream << 4) | out_reg[i];
+#pragma HLS PIPELINE II = 16
+    out_stream[i] = 0;
+    out_stream[i] = out_reg[i];
   }
 }
 
-void iir_filter_I(ap_uint<64> in_stream, ap_uint<64> &out_stream) {
+void iir_filter_I(ap_uint<4> in_stream[NUM_CHANNELS],
+                  ap_uint<4> out_stream[NUM_CHANNELS]) {
+#pragma HLS INTERFACE mode = ap_fifo port = in_stream
+#pragma HLS INTERFACE mode = ap_fifo port = out_stream
 #pragma HLS INTERFACE ap_ctrl_none port = return
 
   static Biquad biquads[NUM_CHANNELS];

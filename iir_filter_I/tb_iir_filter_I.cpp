@@ -1,8 +1,7 @@
 #include "iir_filter_I.h"
 
-ap_uint<64> in_reg = 0x1111111111111111;
-ap_uint<64> out_reg = 0;
-ap_uint<64> res_reg = 0x0000FFFF0001FFFF;
+ap_uint<4> in_reg[NUM_CHANNELS] = {0x1};
+ap_uint<4> out_reg[NUM_CHANNELS];
 
 int main() {
   for (int i = 0; i < 10; i++) {

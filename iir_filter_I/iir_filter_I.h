@@ -20,7 +20,9 @@ private:
   FilterFactors factors;
 
 public:
-  Biquad() : factors({1, 1, 1, 1, 1}), m_b1(0), m_b2(0), m_a1(0), m_a2(0) {}
+  Biquad()
+      : factors(FilterFactors{1, 0, 0, 0, 0}), m_b1(0), m_b2(0), m_a1(0),
+        m_a2(0) {}
 
   ap_uint<4> process(ap_uint<4> in_val) {
 #pragma HLS INLINE off
@@ -35,6 +37,7 @@ public:
   }
 };
 
-void iir_filter_I(ap_uint<64> in_stream, ap_uint<64> &out_stream);
+void iir_filter_I(ap_uint<4> in_stream[NUM_CHANNELS],
+                  ap_uint<4> out_stream[NUM_CHANNELS]);
 
 #endif
