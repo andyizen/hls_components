@@ -5,8 +5,7 @@ ap_uint<64> out_reg = 0;
 ap_uint<64> res_reg = 0x0000FFFF0001FFFF;
 
 int main() {
-  std::cout << std::hex << in_reg << std::endl;
-  for (int i = 0; i < 4; i++) {
+  for (int i = 0; i < 10; i++) {
     iir_filter_I(in_reg, out_reg);
     std::cout << std::hex << out_reg << std::endl;
   }
