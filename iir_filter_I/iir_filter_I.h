@@ -13,22 +13,21 @@ struct FilterFactors {
 class Biquad {
 private:
   // Memory elements for state
-  ap_uint<4> m_b1;
-  ap_uint<4> m_b2;
-  ap_uint<4> m_a1;
-  ap_uint<4> m_a2;
+  smpl_t m_b1;
+  smpl_t m_b2;
+  smpl_t m_a1;
+  smpl_t m_a2;
   FilterFactors factors;
 
 public:
   Biquad()
-      : factors(FilterFactors{1, 0, 0, 0, 0}), m_b1(0), m_b2(0), m_a1(0),
+      : factors(FilterFactors{1, 1, 1, 1, 1}), m_b1(0), m_b2(0), m_a1(0),
         m_a2(0) {}
 
-  ap_uint<4> process(ap_uint<4> in_val) {
+  smpl_t process(smpl_t in_val) {
 #pragma HLS INLINE off
-    ap_uint<4> out_val = in_val * factors.b0 + m_b1 * factors.b1 +
-                         m_b2 * factors.b2 - m_a1 * factors.a1 -
-                         m_a2 * factors.a2;
+    smpl_t out_val = in_val * factors.b0 + m_b1 * factors.b1 +
+                     m_b2 * factors.b2 - m_a1 * factors.a1 - m_a2 * factors.a2;
     m_b2 = m_b1;
     m_b1 = in_val;
     m_a2 = m_a1;
@@ -37,7 +36,6 @@ public:
   }
 };
 
-void iir_filter_I(ap_uint<4> in_stream[NUM_CHANNELS],
-                  ap_uint<4> out_stream[NUM_CHANNELS]);
+void iir_filter_I(smpl_ppln_t &in_stream, smpl_ppln_t &out_stream);
 
 #endif

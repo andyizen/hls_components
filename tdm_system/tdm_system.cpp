@@ -11,12 +11,11 @@ void tdm_system(const bit_t sclk_in, const bit_t lrclk_in, const bit_t sdata_in,
 #pragma HLS INTERFACE ap_none port = sclk_out
 #pragma HLS INTERFACE ap_none port = lrclk_out
 
-  bit_t smpl_rdy = 0;
-  bit_t frame_rdy = 0;
-  bit_t started = 0;
-  smpl_ppln_t data_out;
+  static smpl_ppln_t tdm_out;
+  static smpl_ppln_t filter_out;
 
 #pragma HLS DATAFLOW
-  tdm_gpio_input(sclk_in, lrclk_in, sdata_in, data_out);
-  tdm_gpio_output(data_out, sclk_out, lrclk_out, sdata_out);
+  tdm_gpio_input(sclk_in, lrclk_in, sdata_in, tdm_out);
+  iir_filter_I(tdm_out, filter_out);
+  tdm_gpio_output(filter_out, sclk_out, lrclk_out, sdata_out);
 }
