@@ -2,6 +2,8 @@
 #define IIR_FILTER_I
 
 #include "../lib/tdm_system_spec.h"
+#include "ap_float.h"
+
 struct FilterFactors {
   ap_uint<16> b0;
   ap_uint<16> b1;

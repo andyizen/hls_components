@@ -1,4 +1,3 @@
-#include "ap_int.h"
 
 #ifndef TDM_SIGNAL_BASE_H
 #define TDM_SIGNAL_BASE_H

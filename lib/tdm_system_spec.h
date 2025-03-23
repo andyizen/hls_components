@@ -1,6 +1,13 @@
 #ifndef TDM_SYSTEM_SPECS_H
 #define TDM_SYSTEM_SPECS_H
 
+#define HLS_STREAM
+
+#include <ap_int.h>
+#ifdef HLS_STREAM
+#include <hls_stream.h>
+#endif
+
 constexpr int bitsNeeded(int n) {
   int bits = 0;
   while ((1 << bits) < n) {
@@ -8,13 +15,6 @@ constexpr int bitsNeeded(int n) {
   }
   return bits;
 }
-
-#define HLS_STREAM
-
-#include <ap_int.h>
-#ifdef HLS_STREAM
-#include <hls_stream.h>
-#endif
 
 const int SIZE_SAMPLE = 32;
 typedef ap_uint<SIZE_SAMPLE> smpl_t;
