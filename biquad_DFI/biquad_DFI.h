@@ -1,5 +1,5 @@
-#ifndef biquad_DFI
-#define biquad_DFI
+#ifndef BIQUAD_DFI_H
+#define BIQUAD_DFI_H
 
 #include "../lib/tdm_system_spec.h"
 #include "ap_float.h"
