@@ -1,4 +1,4 @@
-#include "tb_iir_filter_I.h"
+#include "tb_biquad_DFI.h"
 
 TDM_signal_dummy tdm_in{12};
 smpl_t data = 0;
@@ -27,7 +27,7 @@ int main() {
     }
 
     // Sending the signals into the component
-    iir_filter_I(in_reg, out_reg);
+    biquad_DFI(in_reg, out_reg);
 
     // LRCLK CHECK
     if (!out_reg.empty()) {

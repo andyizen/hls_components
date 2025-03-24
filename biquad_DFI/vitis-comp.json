@@ -1,12 +1,12 @@
 {
-  "name": "iir_filter_I",
+  "name": "biquad_DFI",
   "type": "HLS",
   "configuration": {
     "componentType": "HLS",
     "configFiles": [
-      "cfg_iir_filter_I.cfg"
+      "cfg_biquad_DFI.cfg"
     ],
-    "work_dir": "iir_filter_I"
+    "work_dir": "biquad_DFI"
   },
   "previousBuildStatusMap": {}
 }

@@ -1,5 +1,5 @@
 #include "../lib/tdm_signal_base.h"
-#include "iir_filter_I.h"
+#include "biquad_DFI.h"
 
 
 static smpl_t default_data = 0;

@@ -1,5 +1,5 @@
-#ifndef IIR_FILTER_I
-#define IIR_FILTER_I
+#ifndef biquad_DFI
+#define biquad_DFI
 
 #include "../lib/tdm_system_spec.h"
 #include "ap_float.h"
@@ -38,6 +38,6 @@ public:
   }
 };
 
-void iir_filter_I(smpl_ppln_t &in_stream, smpl_ppln_t &out_stream);
+void biquad_DFI(smpl_ppln_t &in_stream, smpl_ppln_t &out_stream);
 
 #endif

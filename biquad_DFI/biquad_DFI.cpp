@@ -1,4 +1,4 @@
-#include "iir_filter_I.h"
+#include "biquad_DFI.h"
 
 enum ProcessState { IDLE, DONE };
 
@@ -23,7 +23,7 @@ void write_stream(smpl_t out_reg, smpl_ppln_t &out_stream,
   }
 }
 
-void iir_filter_I(smpl_ppln_t &in_stream, smpl_ppln_t &out_stream) {
+void biquad_DFI(smpl_ppln_t &in_stream, smpl_ppln_t &out_stream) {
 #pragma HLS INTERFACE ap_ctrl_none port = return
 #pragma HLS INTERFACE mode = axis port = in_stream depth = 1
 #pragma HLS INTERFACE mode = axis port = out_stream depth = 1
