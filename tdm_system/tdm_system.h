@@ -1,7 +1,7 @@
 #ifndef TDM_SYSTEM_H
 #define TDM_SYSTEM_H
 
-#include "../iir_filter_I/iir_filter_I.h"
+#include "../biquad_DFI/biquad_DFI.h"
 #include "../lib/tdm_system_spec.h"
 #include "../tdm_gpio_input/tdm_gpio_input.h"
 #include "../tdm_gpio_output/tdm_gpio_output.h"

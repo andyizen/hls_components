@@ -16,6 +16,6 @@ void tdm_system(const bit_t sclk_in, const bit_t lrclk_in, const bit_t sdata_in,
 
 #pragma HLS DATAFLOW
   tdm_gpio_input(sclk_in, lrclk_in, sdata_in, tdm_out);
-  iir_filter_I(tdm_out, filter_out);
+  biquad_DFI(tdm_out, filter_out);
   tdm_gpio_output(filter_out, sclk_out, lrclk_out, sdata_out);
 }
