@@ -1,0 +1,12 @@
+{
+  "name": "tdm_gpio_input",
+  "type": "HLS",
+  "configuration": {
+    "componentType": "HLS",
+    "configFiles": [
+      "cfg_tdm_gpio_input.cfg"
+    ],
+    "work_dir": "tdm_gpio_input"
+  },
+  "previousBuildStatusMap": {}
+}

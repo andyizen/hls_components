@@ -1,0 +1,12 @@
+{
+  "name": "tdm_gpio_output",
+  "type": "HLS",
+  "configuration": {
+    "componentType": "HLS",
+    "configFiles": [
+      "cfg_tdm_gpio_output.cfg"
+    ],
+    "work_dir": "tdm_gpio_output"
+  },
+  "previousBuildStatusMap": {}
+}

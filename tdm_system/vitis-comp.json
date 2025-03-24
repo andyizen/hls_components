@@ -1,0 +1,12 @@
+{
+  "name": "tdm_system",
+  "type": "HLS",
+  "configuration": {
+    "componentType": "HLS",
+    "configFiles": [
+      "cfg_tdm_system.cfg"
+    ],
+    "work_dir": "tdm_system"
+  },
+  "previousBuildStatusMap": {}
+}

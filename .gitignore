@@ -12,3 +12,5 @@
 !/*/*.cpp
 !/*/*.h
 !/*/*.cfg
+!/*/vitis-comp.json
+!/*/.gitignore
