@@ -4,10 +4,9 @@ void tdm_gpio_output(smpl_ppln_t &in_stream, bit_t &sclk, bit_t &lrclk,
                      bit_t &sdata) {
 
 #pragma HLS INTERFACE mode = axis port = in_stream depth = 1
-#pragma HLS INTERFACE mode = ap_none port = sclk
-#pragma HLS INTERFACE mode = ap_none port = lrclk
-#pragma HLS INTERFACE mode = ap_none port = sdata
-#pragma HLS INTERFACE ap_ctrl_none port = return
+#pragma HLS PIPELINE II = 1
+#pragma HLS LATENCY max = 1 min = 1
+#pragma HLS INLINE recursive
 
   enum LockStatus { UNLOCKED, LOCKED };
 

@@ -3,12 +3,8 @@
 void tdm_gpio_input(bit_t sclk_in, bit_t lrclk_in, bit_t sdata_in,
                     smpl_ppln_t &sample_reg) {
 
-#pragma HLS INTERFACE ap_none port = sclk_in
-#pragma HLS INTERFACE ap_none port = lrclk_in
-#pragma HLS INTERFACE ap_none port = sdata_in
 #pragma HLS INTERFACE mode = axis port = sample_reg depth = 1
-#pragma HLS pipeline II = 1
-#pragma HLS INTERFACE ap_ctrl_none port = return
+#pragma HLS PIPELINE II = 1
 
   enum LockStatus { LOCKED, UNLOCKED };
   // Static variables to preserve state.
