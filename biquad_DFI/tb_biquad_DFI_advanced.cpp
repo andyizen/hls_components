@@ -16,9 +16,11 @@ int max_dif = 0;
 
 const std::string test_folder_path =
     "C:/Users/andreas.hettler/Desktop/master_thesis/test";
-const std::string f_input_data = test_folder_path + "/input.dat";
-const std::string f_golden_data = test_folder_path + "/golden.dat";
-const std::string f_log_data = test_folder_path + "/result_DFI.data";
+const std::string f_input_data = test_folder_path + "/ch_data/input.dat";
+const std::string f_golden_data =
+    test_folder_path + "/results/biquad_DFI_fix/golden.dat";
+const std::string f_log_data =
+    test_folder_path + "/results/biquad_DFI_fix/result.dat";
 
 int main() {
   // Open the input and golden files from the test folder.
@@ -44,7 +46,7 @@ int main() {
     return 1;
   }
 
-  int total_clc_cycles = 10 * NUM_CHANNELS;
+  int total_clc_cycles = 48000 * 2 * NUM_CHANNELS;
   int sample_count = 0;
   int error_count = 0;
   smpl_t golden_val;
@@ -79,9 +81,10 @@ int main() {
     }
   }
 
-  outfile << "Total samples processed: " << sample_count << "\n";
-  outfile << "Total mismatches: " << error_count << "\n";
-  outfile << "Maximum difference: " << max_dif << "\n";
+  std::cout << "Total samples processed: " << sample_count << std::endl;
+  std::cout << "Total mismatches: " << error_count << std::endl;
+  std::cout << "Total mismatches: " << error_count << std::endl;
+  std::cout << "Maximum difference: " << max_dif << std::endl;
 
   infile.close();
   goldenfile.close();

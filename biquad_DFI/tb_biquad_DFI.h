@@ -2,7 +2,7 @@
 #define TB_BIQUAD_DFI_H
 
 #include "../lib/tdm_signal_base.h"
-#include "biquad_DFI.h"
+#include "biquad_DFI_fix.h"
 
 static smpl_t default_data = 0;
 
