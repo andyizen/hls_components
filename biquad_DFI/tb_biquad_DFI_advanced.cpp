@@ -46,7 +46,7 @@ int main() {
     return 1;
   }
 
-  int total_clc_cycles = 48000 * 2 * NUM_CHANNELS;
+  int total_clc_cycles = 100 * NUM_CHANNELS;
   int sample_count = 0;
   int error_count = 0;
   smpl_t golden_val;
@@ -60,7 +60,7 @@ int main() {
       infile >> std::hex >> data;
     }
     in_reg.write(data);
-    biquad_DFI(in_reg, out_reg, sclk_out, sdata_out);
+    biquad_DFI(in_reg, out_reg);
 
     // Check and log output.
     if (!out_reg.empty()) {

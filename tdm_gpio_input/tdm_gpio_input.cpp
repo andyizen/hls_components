@@ -4,6 +4,8 @@ void tdm_gpio_input(bit_t sclk_in, bit_t lrclk_in, bit_t sdata_in,
                     smpl_ppln_t &sample_reg) {
 
 #pragma HLS INTERFACE mode = axis port = sample_reg depth = 1
+#pragma HLS INTERFACE mode = ap_ctrl_none port = return
+#pragma HLS LATENCY min = 1 max = 128
 #pragma HLS PIPELINE II = 1
 
   enum LockStatus { LOCKED, UNLOCKED };

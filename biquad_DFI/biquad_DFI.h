@@ -57,7 +57,6 @@ public:
   }
 };
 
-void biquad_DFI(smpl_ppln_t &in_stream, smpl_ppln_t &out_stream,
-                volatile bit_t &mclk, bit_t &data_out);
+void biquad_DFI(smpl_ppln_t &in_stream, smpl_ppln_t &out_stream);
 
 #endif
