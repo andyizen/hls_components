@@ -19,11 +19,17 @@ constexpr int32_t float_to_q2_30(float x) {
 }
 
 struct FilterCoefficients {
-  const smpl_fix_t b0 = 0.003916126660547368;
-  const smpl_fix_t b1 = 0.007832253321094737;
-  const smpl_fix_t b2 = 0.003916126660547368;
-  const smpl_fix_t a1 = -1.8153410827045682;
-  const smpl_fix_t a2 = 0.8310055893467577;
+  bool update = true;
+  /*   const smpl_fix_t b0 = 0.003916126660547368;
+    const smpl_fix_t b1 = 0.007832253321094737;
+    const smpl_fix_t b2 = 0.003916126660547368;
+    const smpl_fix_t a1 = -1.8153410827045682;
+    const smpl_fix_t a2 = 0.8310055893467577; */
+  smpl_fix_t b0 = 0.0;
+  smpl_fix_t b1 = 0.0;
+  smpl_fix_t b2 = 0.0;
+  smpl_fix_t a1 = 0.0;
+  smpl_fix_t a2 = 0.0;
 };
 
 struct DelayMemory {
@@ -87,6 +93,25 @@ public:
     // Truncate and shift the 24Bit value back up to MSBs of audio data
     // container
     return (out_shifted.to_int() << 8);
+  }
+
+  void set_coeff(FilterCoefficients new_coeff) {
+    if (!new_coeff.update) {
+      return;
+    }
+    coeff.b0 = new_coeff.b0;
+    coeff.b1 = new_coeff.b1;
+    coeff.b2 = new_coeff.b2;
+    coeff.a1 = new_coeff.a1;
+    coeff.a2 = new_coeff.a2;
+
+    // Delete the delays
+    dly.m_b1 = 0;
+    dly.m_b2 = 0;
+    dly.m_a1 = 0;
+    dly.m_a2 = 0;
+
+    new_coeff.update = false;
   }
 };
 
