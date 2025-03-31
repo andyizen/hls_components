@@ -6,7 +6,10 @@
 #include <ap_fixed.h>
 #include <stdint.h>
 
-typedef ap_fixed<48, 24, AP_TRN, AP_WRAP> smpl_fix_inout_t;
+// AP_RND for inout seems to fix the silence issue, that when sent nothing the
+// output is still something very small negative
+// -still takes Takes a couple more resources for LUT and FF
+typedef ap_fixed<48, 24, AP_RND, AP_WRAP> smpl_fix_inout_t;
 typedef ap_fixed<48, 2, AP_TRN, AP_WRAP> smpl_fix_t;
 
 constexpr int32_t float_to_q2_30(float x) {
@@ -45,7 +48,7 @@ public:
 
     smpl_fix_inout_t in_shifted;
     smpl_fix_inout_t out_shifted;
-    smpl_fix_inout_t res[7];
+    smpl_fix_inout_t res[5];
     smpl_fix_t in_val_fix;
     smpl_fix_t out_val_fix;
 
@@ -68,10 +71,8 @@ public:
     res[2] = dly.m_b2 * coeff.b2;
     res[3] = -(dly.m_a1 * coeff.a1);
     res[4] = -(dly.m_a2 * coeff.a2);
-    // Add forward and backward circle
-    res[5] = res[0] + res[1] + res[2];
-    res[6] = res[3] + res[4];
-    out_val_fix = res[5] + res[6];
+
+    out_val_fix = res[0] + res[1] + res[2] + res[3] + res[4];
 
     // Update delay blocks
     dly.m_b2 = dly.m_b1;

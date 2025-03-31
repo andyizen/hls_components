@@ -1,6 +1,8 @@
 #include "tb_biquad_DFI.h"
+
 #include <fstream>
 #include <iostream>
+#include <string>
 
 // Global objects used in the testbench
 TDM_signal_dummy tdm_in{12};
@@ -24,6 +26,14 @@ const std::string f_log_data =
 
 int main() {
   // Open the input and golden files from the test folder.
+
+  /*   wchar_t cwd[PATH_MAX];
+    if (_wgetcwd(cwd, PATH_MAX) != nullptr) {
+      std::wcout << L"Current working directory: " << cwd << std::endl;
+    } else {
+      std::wcerr << L"Error: cannot retrieve current working directory"
+                 << std::endl;
+    } */
   std::ifstream infile(f_input_data);
   if (!infile) {
 

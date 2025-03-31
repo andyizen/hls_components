@@ -14,7 +14,7 @@ Biquad_DFI_fix biquads[NUM_CHANNELS] = {
 // Data path functions
 void read(smpl_ppln_t &in_stream, smpl_t &buf_reg, ProcessState &_prcs_stt_) {
 #pragma HLS INLINE
-  if (!in_stream.empty() && _prcs_stt_ == IDLE) {
+  if (_prcs_stt_ == IDLE) {
     buf_reg = in_stream.read();
     _prcs_stt_ = READ;
   }
@@ -22,7 +22,6 @@ void read(smpl_ppln_t &in_stream, smpl_t &buf_reg, ProcessState &_prcs_stt_) {
 
 void process(smpl_t buf_reg, smpl_t &out_reg, ProcessState &_prcs_stt_) {
 #pragma HLS INLINE
-
   static ch_cntr_t _ch_cnt = 0;
   if (_prcs_stt_ == READ) {
     out_reg = biquads[_ch_cnt].process(buf_reg);
@@ -44,23 +43,17 @@ void write_stream(smpl_t out_reg, smpl_ppln_t &out_stream,
   }
 }
 
-// Group the data path operations in their own function.
-void data_path(smpl_ppln_t &in_stream, smpl_ppln_t &out_stream) {
-  smpl_t buf_reg = 0;
-  smpl_t out_reg = 0;
-  ProcessState _prcs_stt_ = IDLE;
-
-  read(in_stream, buf_reg, _prcs_stt_);
-  process(buf_reg, out_reg, _prcs_stt_);
-  write_stream(out_reg, out_stream, _prcs_stt_);
-}
-
 // Top-level function: run data_path and clk_gen concurrently.
 void biquad_DFI(smpl_ppln_t &in_stream, smpl_ppln_t &out_stream) {
+//#pragma HLS INTERFACE mode = s_axilite port = coeffs storage_impl = bram
 #pragma HLS INTERFACE axis port = out_stream
 #pragma HLS INTERFACE axis port = in_stream
 #pragma HLS INTERFACE mode = ap_ctrl_none port = return
 
-#pragma HLS DATAFLOW
-  data_path(in_stream, out_stream);
+  static smpl_t buf_reg = 0;
+  static smpl_t out_reg = 0;
+  ProcessState _prcs_stt_ = IDLE;
+  read(in_stream, buf_reg, _prcs_stt_);
+  process(buf_reg, out_reg, _prcs_stt_);
+  write_stream(out_reg, out_stream, _prcs_stt_);
 }
