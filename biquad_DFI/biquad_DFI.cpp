@@ -3,39 +3,50 @@
 #include "hls_task.h"
 
 enum ProcessState { READ, PROCESS, WRITE };
+enum MemoryState { LOAD, SAVE };
 
 // FilterCoefficients factors_array[NUM_CHANNELS];
 Biquad_DFI_fix biquad = Biquad_DFI_fix();
+// Create internal delay memory
+smpl_fix72_t mem_dly[NUM_CHANNELS * NUM_DELAYS];
 
 // Top-level function: run data_path and clk_gen concurrently.
 void biquad_DFI(smpl_ppln_t &in_stream, smpl_ppln_t &out_stream,
-                const FilterCoefficients coeff[NUM_CHANNELS],
-                smpl_fix_t mem[NUM_CHANNELS * NUM_OF_DELAYS]) {
+                const smpl_fix32_t mem_coeff[NUM_CHANNELS * NUM_COEFFS]) {
 // Kompakteste Speicherung
-#pragma HLS INTERFACE m_axi port = coeff offset = slave bundle = MEM
-#pragma HLS INTERFACE s_axilite port = coeff bundle = CTRL
-#pragma HLS INTERFACE mode = ap_memory port = mem storage_type = ram_1p
+#pragma HLS INTERFACE mode = m_axi port = mem_coeff bundle = MEM offset = slave
+#pragma HLS INTERFACE s_axilite port = mem_coeff bundle = CTRL
+#pragma HLS BIND_STORAGE variable = mem_dly type = ram_1p
 
 #pragma HLS INTERFACE axis port = out_stream
 #pragma HLS INTERFACE axis port = in_stream
 #pragma HLS INTERFACE mode = ap_ctrl_none port = return
 
   static ProcessState _prcs_stt_ = READ;
-
+  static MemoryState _mem_stt_ = LOAD;
   static ch_cntr_t _ch_cnt_;
   static DelayMemory dly;
+  static FilterCoefficients coeff;
   static smpl_t buf_reg;
   static smpl_t out_reg;
 
   if (_prcs_stt_ == READ) {
     buf_reg = in_stream.read();
     // Prepare Delays
-    dly.m_a1 = mem[_ch_cnt_ * NUM_OF_DELAYS + 0];
-    dly.m_a2 = mem[_ch_cnt_ * NUM_OF_DELAYS + 1];
-    dly.m_b1 = mem[_ch_cnt_ * NUM_OF_DELAYS + 2];
-    dly.m_b2 = mem[_ch_cnt_ * NUM_OF_DELAYS + 3];
+    dly.m_a1 = mem_dly[_ch_cnt_ * NUM_DELAYS + 0];
+    dly.m_a2 = mem_dly[_ch_cnt_ * NUM_DELAYS + 1];
+    dly.m_b1 = mem_dly[_ch_cnt_ * NUM_DELAYS + 2];
+    dly.m_b2 = mem_dly[_ch_cnt_ * NUM_DELAYS + 3];
 
-    biquad.set_coeff(coeff[_ch_cnt_]);
+    if (_mem_stt_ == LOAD) {
+      coeff.b0 = mem_coeff[_ch_cnt_ * NUM_COEFFS + 0];
+      coeff.b1 = mem_coeff[_ch_cnt_ * NUM_COEFFS + 1];
+      coeff.b2 = mem_coeff[_ch_cnt_ * NUM_COEFFS + 2];
+      coeff.a1 = mem_coeff[_ch_cnt_ * NUM_COEFFS + 3];
+      coeff.a2 = mem_coeff[_ch_cnt_ * NUM_COEFFS + 4];
+      _mem_stt_ = SAVE;
+    }
+    biquad.set_coeff(coeff);
     biquad.set_dly(dly);
     _prcs_stt_ = PROCESS;
   } else if (_prcs_stt_ == PROCESS) {
@@ -45,11 +56,12 @@ void biquad_DFI(smpl_ppln_t &in_stream, smpl_ppln_t &out_stream,
 #pragma HLS PIPELINE off
     out_stream.write(out_reg);
     dly = biquad.get_dly();
-    mem[_ch_cnt_ * NUM_OF_DELAYS + 0] = dly.m_a1;
-    mem[_ch_cnt_ * NUM_OF_DELAYS + 1] = dly.m_a2;
-    mem[_ch_cnt_ * NUM_OF_DELAYS + 2] = dly.m_b1;
-    mem[_ch_cnt_ * NUM_OF_DELAYS + 3] = dly.m_b2;
+    mem_dly[_ch_cnt_ * NUM_DELAYS + 0] = dly.m_a1;
+    mem_dly[_ch_cnt_ * NUM_DELAYS + 1] = dly.m_a2;
+    mem_dly[_ch_cnt_ * NUM_DELAYS + 2] = dly.m_b1;
+    mem_dly[_ch_cnt_ * NUM_DELAYS + 3] = dly.m_b2;
     _ch_cnt_++;
     _prcs_stt_ = READ;
+    _mem_stt_ = LOAD;
   }
 }

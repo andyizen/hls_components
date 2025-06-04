@@ -6,8 +6,8 @@ smpl_t Biquad_DFI_fix::process(smpl_t in_val) {
   smpl_fix_inout_t in_shifted;
   smpl_fix_inout_t out_shifted;
   smpl_fix_inout_t res[5];
-  smpl_fix_t in_val_fix;
-  smpl_fix_t out_val_fix;
+  smpl_fix32_t in_val_fix;
+  smpl_fix32_t out_val_fix;
 
 // Put the addition into the fabric here
 // Also save the delays in BRAM to save LUT space

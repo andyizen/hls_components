@@ -56,11 +56,14 @@ double b2 = std::stof(config["b_2"]);
 double a1 = std::stof(config["a_1"]);
 double a2 = std::stof(config["a_2"]);
 FilterCoefficients factors = {b0, b1, b2, a1, a2};
-FilterCoefficients coeff[NUM_CHANNELS] = {
-    factors, factors, factors, factors, factors, factors, factors, factors,
-    factors, factors, factors, factors, factors, factors, factors, factors};
+smpl_fix32_t coeff[NUM_CHANNELS * NUM_COEFFS] = {
+    b0, b1, b2, a1, a2, b0, b1, b2, a1, a2, b0, b1, b2, a1, a2, b0,
+    b1, b2, a1, a2, b0, b1, b2, a1, a2, b0, b1, b2, a1, a2, b0, b1,
+    b2, a1, a2, b0, b1, b2, a1, a2, b0, b1, b2, a1, a2, b0, b1, b2,
+    a1, a2, b0, b1, b2, a1, a2, b0, b1, b2, a1, a2, b0, b1, b2, a1,
+    a2, b0, b1, b2, a1, a2, b0, b1, b2, a1, a2, b0, b1, b2, a1, a2};
 
-smpl_fix_t dly[NUM_OF_DELAYS * NUM_CHANNELS];
+// smpl_fix_t dly[NUM_OF_DELAYS * NUM_CHANNELS];
 
 bit_t sclk_out;
 bit_t lrclk_out;
@@ -116,7 +119,7 @@ int main() {
       process one sample and deliver an output. That means we got to lock the
       input until there is an output. After that we can read the next line */
 
-    biquad_DFI(in_reg, out_reg, coeff, dly);
+    biquad_DFI(in_reg, out_reg, coeff);
 
     if (!out_reg.empty() && read_stt == LOCKED) {
       // Check and log output.

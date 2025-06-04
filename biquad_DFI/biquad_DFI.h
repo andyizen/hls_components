@@ -5,10 +5,9 @@
 #include "ap_float.h"
 #include "biquad_DFI_fix.h"
 
-const int NUM_OF_DELAYS = 4;
+const int NUM_COEFFS = 5;
 
 void biquad_DFI(smpl_ppln_t &in_stream, smpl_ppln_t &out_stream,
-                const FilterCoefficients coeff[NUM_CHANNELS],
-                smpl_fix_t mem[NUM_CHANNELS * NUM_OF_DELAYS]);
+                const smpl_fix32_t coeff[NUM_CHANNELS * NUM_COEFFS]);
 
 #endif
