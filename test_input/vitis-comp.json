@@ -1,0 +1,12 @@
+{
+  "name": "test_input",
+  "type": "HLS",
+  "configuration": {
+    "componentType": "HLS",
+    "configFiles": [
+      "cfg_test_input.cfg"
+    ],
+    "work_dir": "test_input"
+  },
+  "previousBuildStatusMap": {}
+}
