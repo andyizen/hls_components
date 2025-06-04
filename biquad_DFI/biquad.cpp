@@ -1,6 +1,4 @@
-#include "biquad_DFI.h"
-#include "biquad_DFI_fix.h"
-#include "hls_task.h"
+#include "biquad.h"
 
 enum ProcessState { READ, PROCESS, WRITE };
 enum MemoryState { LOAD, SAVE };

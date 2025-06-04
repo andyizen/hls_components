@@ -1,4 +1,4 @@
-#include "biquad_DFI.h"
+#include "biquad.h"
 #include "tb_biquad_DFI.h"
 
 #include <algorithm>
