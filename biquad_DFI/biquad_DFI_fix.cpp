@@ -1,5 +1,9 @@
 #include "biquad_DFI_fix.h"
 
+Biquad_DFI_fix::Biquad_DFI_fix(const FilterCoefficients &coeff,
+                               DelayMemory &dly)
+    : coeff(coeff), dly(dly) {}
+
 smpl_t Biquad_DFI_fix::process(smpl_t in_val) {
 #pragma HLS PIPELINE II = 128
 
@@ -46,8 +50,4 @@ smpl_t Biquad_DFI_fix::process(smpl_t in_val) {
   return (out_shifted.to_int() << 8);
 }
 
-void Biquad_DFI_fix::set_coeff(const FilterCoefficients &new_coeff) {
-  coeff = new_coeff;
-}
-void Biquad_DFI_fix::set_dly(DelayMemory &new_dly) { dly = new_dly; }
-DelayMemory Biquad_DFI_fix::get_dly() { return dly; }
+// DelayMemory Biquad_DFI_fix::get_dly() { return dly; }

@@ -4,10 +4,7 @@
 #define HLS_STREAM
 
 #include <ap_int.h>
-
-#ifdef HLS_STREAM
 #include <hls_stream.h>
-#endif
 
 constexpr int bitsNeeded(int n) {
   int bits = 0;
@@ -31,11 +28,6 @@ const int CNT_BIT_DEPTH_MCLKS_PER_BIT = bitsNeeded(MCLKS_PER_BIT);
 typedef ap_uint<CNT_BIT_DEPTH_MCLKS_PER_BIT> mclk_cntr_t;
 
 typedef ap_uint<1> bit_t;
-
-#ifndef HLS_STREAM
-typedef smpl_t smpl_ppln_t;
-#else
 typedef hls::stream<smpl_t> smpl_ppln_t;
-#endif
 
 #endif

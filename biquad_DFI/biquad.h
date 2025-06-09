@@ -8,6 +8,6 @@
 const int NUM_COEFFS = 5;
 
 void biquad_DFI(smpl_ppln_t &in_stream, smpl_ppln_t &out_stream,
-                const smpl_fix32_t coeff[NUM_CHANNELS * NUM_COEFFS]);
+                const coeff32_t mem_coeff[NUM_CHANNELS * NUM_COEFFS]);
 
 #endif

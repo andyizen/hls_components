@@ -13,7 +13,6 @@ const int NUM_DELAYS = 4;
 // -still takes Takes a couple more resources for LUT and FF
 typedef ap_fixed<48, 24, AP_RND, AP_WRAP> smpl_fix_inout_t;
 typedef ap_fixed<32, 2, AP_TRN, AP_WRAP> smpl_fix32_t;
-typedef ap_fixed<72, 2, AP_TRN, AP_WRAP> smpl_fix72_t;
 
 constexpr int32_t float_to_q2_30(float x) {
   const int64_t Q2_30_SCALE = 1LL << 30;
@@ -21,32 +20,32 @@ constexpr int32_t float_to_q2_30(float x) {
       (x >= 2.0f ? 1.999999f : (x < -2.0f ? -2.0f : x)) * Q2_30_SCALE);
 }
 
+typedef ap_fixed<32, 2, AP_TRN, AP_WRAP> coeff32_t;
 struct FilterCoefficients {
-  smpl_fix32_t b0;
-  smpl_fix32_t b1;
-  smpl_fix32_t b2;
-  smpl_fix32_t a1;
-  smpl_fix32_t a2;
+  coeff32_t b0;
+  coeff32_t b1;
+  coeff32_t b2;
+  coeff32_t a1;
+  coeff32_t a2;
 };
+
+typedef ap_fixed<72, 2, AP_TRN, AP_WRAP> dly_72_t;
 struct DelayMemory {
-  smpl_fix72_t m_b1;
-  smpl_fix72_t m_b2;
-  smpl_fix72_t m_a1;
-  smpl_fix72_t m_a2;
+  dly_72_t m_b1;
+  dly_72_t m_b2;
+  dly_72_t m_a1;
+  dly_72_t m_a2;
 };
 
 class Biquad_DFI_fix {
 private:
   // Memory elements for state
-  DelayMemory dly;
-  FilterCoefficients coeff;
+  DelayMemory &dly;
+  const FilterCoefficients &coeff;
 
 public:
-  Biquad_DFI_fix() {}
+  Biquad_DFI_fix(const FilterCoefficients &coeff, DelayMemory &dly);
   smpl_t process(smpl_t in_val);
-  void set_coeff(const FilterCoefficients &new_coeff);
-  void set_dly(DelayMemory &new_dly);
-  DelayMemory get_dly();
 };
 
 #endif

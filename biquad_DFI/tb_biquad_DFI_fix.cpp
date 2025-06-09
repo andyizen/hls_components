@@ -64,6 +64,7 @@ smpl_fix32_t coeff[NUM_CHANNELS * NUM_COEFFS] = {
     a2, b0, b1, b2, a1, a2, b0, b1, b2, a1, a2, b0, b1, b2, a1, a2};
 
 // smpl_fix_t dly[NUM_OF_DELAYS * NUM_CHANNELS];
+FilterCoefficients read_coffs;
 
 bit_t sclk_out;
 bit_t lrclk_out;
@@ -119,7 +120,7 @@ int main() {
       process one sample and deliver an output. That means we got to lock the
       input until there is an output. After that we can read the next line */
 
-    biquad_DFI(in_reg, out_reg, coeff);
+    biquad_DFI(in_reg, out_reg, coeff, read_coffs);
 
     if (!out_reg.empty() && read_stt == LOCKED) {
       // Check and log output.
