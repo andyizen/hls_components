@@ -6,11 +6,11 @@ enum MemoryState { LOAD, SAVE };
 // FilterCoefficients factors_array[NUM_CHANNELS];
 
 // Create internal delay memory
-dly_72_t mem_dly[NUM_CHANNELS * NUM_DELAYS];
+dly_t mem_dly[NUM_CHANNELS * NUM_DELAYS] = {};
 
 // Top-level function: run data_path and clk_gen concurrently.
 void biquad_DFI(smpl_ppln_t &in_stream, smpl_ppln_t &out_stream,
-                const coeff32_t mem_coeff[NUM_CHANNELS * NUM_COEFFS]) {
+                const coeff_t mem_coeff[NUM_CHANNELS * NUM_COEFFS]) {
 // Kompakteste Speicherung
 #pragma HLS INTERFACE mode = m_axi port = mem_coeff bundle = MEM offset = slave
 #pragma HLS INTERFACE s_axilite port = mem_coeff bundle = CTRL

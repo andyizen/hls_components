@@ -120,7 +120,7 @@ int main() {
       process one sample and deliver an output. That means we got to lock the
       input until there is an output. After that we can read the next line */
 
-    biquad_DFI(in_reg, out_reg, coeff, read_coffs);
+    biquad_DFI(in_reg, out_reg, coeff);
 
     if (!out_reg.empty() && read_stt == LOCKED) {
       // Check and log output.

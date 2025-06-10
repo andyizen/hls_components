@@ -9,7 +9,7 @@ smpl_t Biquad_DFI_fix::process(smpl_t in_val) {
 
   smpl_fix_inout_t in_shifted;
   smpl_fix_inout_t out_shifted;
-  smpl_fix_inout_t res[5];
+  smpl_fix72_t res[5];
   smpl_fix32_t in_val_fix;
   smpl_fix32_t out_val_fix;
 
@@ -23,8 +23,7 @@ smpl_t Biquad_DFI_fix::process(smpl_t in_val) {
 #pragma HLS allocation operation instances = add limit = 1
 
   // Shift down the 24Bit audio data and then shift this into fix point realm
-  in_shifted = in_val >> 8;
-  in_val_fix = in_shifted >> 23;
+  in_val_fix.range(31, 8) = in_val.range(31, 8);
 
   // Classic biquad DFI structure
   res[0] = in_val_fix * coeff.b0;
@@ -43,8 +42,7 @@ smpl_t Biquad_DFI_fix::process(smpl_t in_val) {
 
   // Put the fixed value into a out shift containerm, then shift back into
   // integer realm
-  out_shifted = out_val_fix;
-  out_shifted = out_shifted << 23;
+  out_shifted.range(47, 24) = out_val_fix.range(31, 8);
   // Truncate and shift the 24Bit value back up to MSBs of audio data
   // container
   return (out_shifted.to_int() << 8);
