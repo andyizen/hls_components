@@ -1,0 +1,12 @@
+{
+  "name": "biquad_DFII",
+  "type": "HLS",
+  "configuration": {
+    "componentType": "HLS",
+    "configFiles": [
+      "cfg_biquad_dfII.cfg"
+    ],
+    "work_dir": "biquad_DFII"
+  },
+  "previousBuildStatusMap": {}
+}
