@@ -27,11 +27,10 @@ smpl_t Biquad_DFII_fix::process(smpl_t in_val) {
   // Eingabewert in Fixed-Point-Format
   in_val_fix.range(31, 8) = in_val.range(31, 8);
 
+  /*
   std::string in = in_val_fix.to_string(10, true);
   std::string w1 = dly.w1.to_string(10, true);
   std::string w2 = dly.w2.to_string(10, true);
-
-  /*
   static int count = 0;
   const std::string p_test_folder =
       "C:/Users/andreas.hettler/Desktop/master_thesis/test";
@@ -67,15 +66,14 @@ smpl_t Biquad_DFII_fix::process(smpl_t in_val) {
 
   out_val_fix = res[3] + res[4] + res[5];
 
-  std::string out = out_val_fix.to_string(10, true);
-
   // Direct Form II – Zustandstransformation
   dly.w2 = dly.w1;
   dly.w1 = res[2];
 
+  /*
   w1 = dly.w1.to_string(10, true);
   w2 = dly.w2.to_string(10, true);
-  /*
+  std::string out = out_val_fix.to_string(10, true);
   if (count % 16 == 0) {
 
     outfile << "res[0]\t" << res0 << std::endl;
