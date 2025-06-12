@@ -17,7 +17,6 @@ void biquad_DFII(smpl_ppln_t &in_stream, smpl_ppln_t &out_stream,
 
 /*#pragma HLS INTERFACE s_axilite port = read_coeffs bundle = COEFF*/
 #pragma HLS BIND_STORAGE variable = mem_dly type = ram_1p
-
 #pragma HLS INTERFACE axis port = out_stream
 #pragma HLS INTERFACE axis port = in_stream
 #pragma HLS INTERFACE mode = ap_ctrl_none port = return

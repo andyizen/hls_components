@@ -2,7 +2,6 @@
 #define BIQUAD_DFII_H
 
 #include "../lib/tdm_system_spec.h"
-#include "ap_float.h"
 #include "biquad_DFII_fix.h"
 
 const int NUM_COEFFS = 5;
