@@ -37,7 +37,8 @@ const std::string p_test_folder =
     "C:/Users/andreas.hettler/Desktop/master_thesis/test";
 const std::string f_input_data = p_test_folder + "/input/input_sinus_multi.dat";
 const std::string f_cfg_data = p_test_folder + "/input/filter.cfg";
-const std::string f_output_data = p_test_folder + "/result/result.dat";
+const std::string f_output_data =
+    p_test_folder + "/result/biquad_DFI/result.dat";
 
 // Global objects used in the testbench
 TDM_signal_dummy tdm_in{12};

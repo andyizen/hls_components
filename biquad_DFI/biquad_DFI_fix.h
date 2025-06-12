@@ -11,8 +11,8 @@ const int NUM_DELAYS = 4;
 // AP_RND for inout seems to fix the silence issue, that when sent nothing the
 // output is still something very small negative
 // -still takes Takes a couple more resources for LUT and FF
-typedef ap_fixed<48, 24, AP_TRN, AP_WRAP> smpl_fix_inout_t;
-typedef ap_fixed<32, 2, AP_TRN, AP_WRAP> smpl_fix32_t;
+typedef ap_fixed<32, 1, AP_TRN, AP_WRAP> smpl_fix_inout_t;
+typedef ap_fixed<36, 2, AP_TRN, AP_WRAP> smpl_fix32_t;
 typedef ap_fixed<72, 2, AP_TRN, AP_WRAP> smpl_fix72_t;
 
 constexpr int32_t float_to_q2_30(float x) {

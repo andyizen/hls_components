@@ -7,11 +7,10 @@ Biquad_DFI_fix::Biquad_DFI_fix(const FilterCoefficients &coeff,
 smpl_t Biquad_DFI_fix::process(smpl_t in_val) {
 #pragma HLS PIPELINE II = 128
 
-  smpl_fix_inout_t in_shifted;
-  smpl_fix_inout_t out_shifted;
-  smpl_fix72_t res[5];
-  smpl_fix32_t in_val_fix;
-  smpl_fix32_t out_val_fix;
+  smpl_fix72_t res[5] = {};
+  smpl_fix_inout_t in_val_fix;
+  smpl_fix_inout_t out_val_fix;
+  smpl_t out_val;
 
 // Put the addition into the fabric here
 // Also save the delays in BRAM to save LUT space
@@ -22,7 +21,7 @@ smpl_t Biquad_DFI_fix::process(smpl_t in_val) {
 #pragma HLS allocation operation instances = mul limit = 1
 #pragma HLS allocation operation instances = add limit = 1
 
-  // Shift down the 24Bit audio data and then shift this into fix point realm
+  // Eingabewert in Fixed-Point-Format
   in_val_fix.range(31, 8) = in_val.range(31, 8);
 
   // Classic biquad DFI structure
@@ -42,10 +41,8 @@ smpl_t Biquad_DFI_fix::process(smpl_t in_val) {
 
   // Put the fixed value into a out shift containerm, then shift back into
   // integer realm
-  out_shifted.range(47, 24) = out_val_fix.range(31, 8);
-  // Truncate and shift the 24Bit value back up to MSBs of audio data
-  // container
-  return (out_shifted.to_int() << 8);
+  out_val.range(31, 8) = out_val_fix.range(31, 8);
+  return out_val & 0xFFFFFF00;
 }
 
 // DelayMemory Biquad_DFI_fix::get_dly() { return dly; }
