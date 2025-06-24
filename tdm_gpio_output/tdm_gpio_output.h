@@ -1,5 +1,5 @@
-#ifndef TDM_GPIO_OUTPUT_H
-#define TDM_GPIO_OUTPUT_H
+#ifndef _TDM_GPIO_OUTPUT_H_
+#define _TDM_GPIO_OUTPUT_H_
 
 #include "../lib/tdm_system_spec.h"
 

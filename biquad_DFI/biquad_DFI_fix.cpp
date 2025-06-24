@@ -1,9 +1,6 @@
 #include "biquad_DFI_fix.h"
 
-Biquad_DFI_fix::Biquad_DFI_fix(const FilterCoefficients &coeff,
-                               DelayMemory &dly)
-    : coeff(coeff), dly(dly) {}
-
+Biquad_DFI_fix::Biquad_DFI_fix() {}
 smpl_t Biquad_DFI_fix::process(smpl_t in_val) {
 
   smpl_fix72_t res[6] = {0, 0, 0, 0, 0, 0};
@@ -38,7 +35,39 @@ smpl_t Biquad_DFI_fix::process(smpl_t in_val) {
   out_val_fix = res[5];
 
   // Put the fixed value into a out shift containerm, then shift back into
-  // integer realm
-  out_val.range(31, 8) = out_val_fix.range(31, 8);
-  return out_val & 0xFFFFFF00;
+  // Unsigned cast so the sign does not get shifted to the MSB
+  out_val = static_cast<smpl_u_t>(out_val_fix.range(31, 8)) & 0x00FFFFFFu;
+  return out_val << 8;
+}
+
+void Biquad_DFI_fix::set_dly(dly_t *mem_dly, ch_cntr_t _ch_cnt_) {
+  dly.m_a1 = 0;
+  dly.m_a2 = 0;
+  dly.m_b2 = 0;
+  dly.m_b1 = 0;
+
+  dly.m_a1 = mem_dly[_ch_cnt_ * NUM_DELAYS + 0];
+  dly.m_a2 = mem_dly[_ch_cnt_ * NUM_DELAYS + 1];
+  dly.m_b1 = mem_dly[_ch_cnt_ * NUM_DELAYS + 2];
+  dly.m_b2 = mem_dly[_ch_cnt_ * NUM_DELAYS + 3];
+}
+void Biquad_DFI_fix::set_coeff(coeff_t *mem_coeff, ch_cntr_t _ch_cnt_) {
+  coeff.b0 = 0;
+  coeff.b1 = 0;
+  coeff.b2 = 0;
+  coeff.a1 = 0;
+  coeff.a2 = 0;
+
+  coeff.b0 = mem_coeff[_ch_cnt_ * NUM_COEFFS + 0];
+  coeff.b1 = mem_coeff[_ch_cnt_ * NUM_COEFFS + 1];
+  coeff.b2 = mem_coeff[_ch_cnt_ * NUM_COEFFS + 2];
+  coeff.a1 = mem_coeff[_ch_cnt_ * NUM_COEFFS + 3];
+  coeff.a2 = mem_coeff[_ch_cnt_ * NUM_COEFFS + 4];
+}
+
+void Biquad_DFI_fix::update_dly(dly_t *mem_dly, ch_cntr_t _ch_cnt_) {
+  mem_dly[_ch_cnt_ * NUM_DELAYS + 0] = dly.m_a1;
+  mem_dly[_ch_cnt_ * NUM_DELAYS + 1] = dly.m_a2;
+  mem_dly[_ch_cnt_ * NUM_DELAYS + 2] = dly.m_b1;
+  mem_dly[_ch_cnt_ * NUM_DELAYS + 3] = dly.m_b2;
 }

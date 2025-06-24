@@ -4,7 +4,7 @@
   "configuration": {
     "componentType": "HLS",
     "configFiles": [
-      "cfg_biquad_dfII.cfg"
+      "cfg_biquad_DFII.cfg"
     ],
     "work_dir": "biquad_DFII"
   },

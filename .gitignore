@@ -14,3 +14,6 @@
 !/*/*.cfg
 !/*/vitis-comp.json
 !/*/.gitignore
+
+# Path variable
+/lib/path.h

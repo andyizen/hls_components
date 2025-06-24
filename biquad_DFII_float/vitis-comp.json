@@ -1,12 +1,12 @@
 {
-  "name": "prod_cons",
+  "name": "biquad_DFII_float",
   "type": "HLS",
   "configuration": {
     "componentType": "HLS",
     "configFiles": [
-      "cfg_prod_cons.cfg"
+      "cfg_biquad_DFII_float.cfg"
     ],
-    "work_dir": "prod_cons"
+    "work_dir": "biquad_DFII_float"
   },
   "previousBuildStatusMap": {}
 }

@@ -1,5 +1,5 @@
+#include "../lib/path.h"
 #include "biquad.h"
-#include "tb_biquad_DFI.h"
 
 #include <algorithm>
 #include <algorithm> // std::fill_n
@@ -33,12 +33,8 @@ parseConfig(const std::string &filename) {
   return config;
 }
 
-const std::string p_test_folder =
-    "C:/Users/andreas.hettler/Desktop/master_thesis/test";
-const std::string f_cfg_data = p_test_folder + "/input/filter.cfg";
-
-// Global objects used in the testbench
-TDM_signal_dummy tdm_in{12};
+const std::string p_test_folder = PATH_TEST_FOLDER;
+const std::string f_cfg_data = p_test_folder + "/input/filter.coe";
 
 enum ReadState { LOCKED, UNLOCKED };
 

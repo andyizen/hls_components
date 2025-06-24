@@ -1,5 +1,5 @@
-#ifndef TDM_COUNT_H
-#define TDM_COUNT_H
+#ifndef _TDM_GPIO_INPUT_H_
+#define _TDM_GPIO_INPUT_H_
 
 #include "../lib/tdm_system_spec.h"
 

@@ -1,12 +1,12 @@
 {
-  "name": "test_input",
+  "name": "biquad_DFI_float",
   "type": "HLS",
   "configuration": {
     "componentType": "HLS",
     "configFiles": [
-      "cfg_test_input.cfg"
+      "cfg_biquad_DFI_float.cfg"
     ],
-    "work_dir": "test_input"
+    "work_dir": "biquad_DFI_float"
   },
   "previousBuildStatusMap": {}
 }

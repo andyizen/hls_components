@@ -16,6 +16,7 @@ constexpr int bitsNeeded(int n) {
 
 const int SIZE_SAMPLE = 32;
 typedef ap_int<SIZE_SAMPLE> smpl_t;
+typedef ap_uint<SIZE_SAMPLE> smpl_u_t;
 const int CNT_BIT_DEPTH_SIZE_SAMPLE = bitsNeeded(SIZE_SAMPLE);
 typedef ap_uint<CNT_BIT_DEPTH_SIZE_SAMPLE> smpl_bts_cntr_t;
 

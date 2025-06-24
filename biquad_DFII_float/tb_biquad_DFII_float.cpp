@@ -1,7 +1,5 @@
 #include "../lib/path.h"
 #include "biquad.h"
-
-
 #include <algorithm>
 #include <cmath>
 #include <fstream>
@@ -34,7 +32,7 @@ parseConfig(const std::string &filename) {
 }
 
 const std::string p_test_folder = PATH_TEST_FOLDER;
-const std::string f_cfg_data = p_test_folder + "/input/filter.coe ";
+const std::string f_cfg_data = p_test_folder + "/input/filter.coe";
 
 enum ReadState { LOCKED, UNLOCKED };
 
@@ -44,13 +42,13 @@ ReadState read_stt = UNLOCKED;
 
 // Open filter cfg and set coeffs
 auto config = parseConfig(f_cfg_data);
-double b0 = std::stof(config["b_0"]);
-double b1 = std::stof(config["b_1"]);
-double b2 = std::stof(config["b_2"]);
-double a1 = std::stof(config["a_1"]);
-double a2 = std::stof(config["a_2"]);
+float b0 = std::stof(config["b_0"]);
+float b1 = std::stof(config["b_1"]);
+float b2 = std::stof(config["b_2"]);
+float a1 = std::stof(config["a_1"]);
+float a2 = std::stof(config["a_2"]);
 FilterCoefficients factors = {b0, b1, b2, a1, a2};
-smpl_fix32_t coeff[NUM_CHANNELS * NUM_COEFFS] = {
+smpl_float_t coeff[NUM_CHANNELS * NUM_COEFFS] = {
     b0, b1, b2, a1, a2, b0, b1, b2, a1, a2, b0, b1, b2, a1, a2, b0,
     b1, b2, a1, a2, b0, b1, b2, a1, a2, b0, b1, b2, a1, a2, b0, b1,
     b2, a1, a2, b0, b1, b2, a1, a2, b0, b1, b2, a1, a2, b0, b1, b2,
@@ -72,7 +70,7 @@ int main(int argc, char *argv[]) {
     const std::string f_input_data =
         p_test_folder + "/input/input_" + signal + "_multi.dat";
     const std::string f_output_data =
-        p_test_folder + "/result/biquad_DFII/result_" + signal + ".dat";
+        p_test_folder + "/result/biquad_DFII_float/result_" + signal + ".dat";
 
     // Opening files
     std::ifstream infile(f_input_data);
@@ -117,10 +115,11 @@ int main(int argc, char *argv[]) {
         read_stt = LOCKED;
       }
       /* We got to consider that even the c simulation takes three calls to
-        process one sample and deliver an output. That means we got to lock the
-        input until there is an output. After that we can read the next line */
+        process one sample and deliver an output (due to the state machine
+        internally). That means we got to lock the input until there is an
+        output. After that we can read the next line */
 
-      biquad_DFII(in_reg, out_reg, coeff);
+      biquad_DFII_float(in_reg, out_reg, coeff);
 
       if (!out_reg.empty() && read_stt == LOCKED) {
         // Check and log output.

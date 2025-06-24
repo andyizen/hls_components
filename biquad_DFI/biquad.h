@@ -5,9 +5,7 @@
 #include "ap_float.h"
 #include "biquad_DFI_fix.h"
 
-const int NUM_COEFFS = 5;
-
 void biquad_DFI(smpl_ppln_t &in_stream, smpl_ppln_t &out_stream,
-                const coeff_t mem_coeff[NUM_CHANNELS * NUM_COEFFS]);
+                coeff_t mem_coeff[NUM_CHANNELS * NUM_COEFFS]);
 
 #endif
